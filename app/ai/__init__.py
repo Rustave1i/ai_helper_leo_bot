@@ -1,3 +1,3 @@
-from app.ai.mistral_client import MistralClient
+from app.ai.provider_factory import ProviderFactory
 
-mistral = MistralClient()
+ai = ProviderFactory.get_provider()

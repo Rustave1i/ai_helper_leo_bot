@@ -1,25 +1,46 @@
 from pathlib import Path
-from dotenv import load_dotenv
 import os
+
+from dotenv import load_dotenv
 
 # Корневая папка проекта
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Загружаем переменные из файла .env
+# Загружаем .env
 load_dotenv(BASE_DIR / ".env")
 
+# ==========================================
+# Какой AI использовать
+# ==========================================
+AI_PROVIDER = os.getenv("AI_PROVIDER", "mistral")
+
+# ==========================================
 # Telegram
+# ==========================================
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 
-# Mistral AI
+# ==========================================
+# Mistral
+# ==========================================
 MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY")
-MODEL = os.getenv("MODEL", "mistral-small-latest")
+MISTRAL_MODEL = os.getenv(
+    "MISTRAL_MODEL",
+    "mistral-small-latest",
+)
 
+# ==========================================
+# Gemini
+# ==========================================
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+GEMINI_MODEL = os.getenv(
+    "GEMINI_MODEL",
+    "gemini-2.5-flash",
+)
+
+# ==========================================
 # OpenWeather
-OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY")
-
-if __name__ == "__main__":
-    print(f"BOT_TOKEN: {BOT_TOKEN[:10]}...")
-    print(f"MISTRAL_API_KEY: {MISTRAL_API_KEY[:10]}...")
-    print(f"OPENWEATHER_API_KEY: {OPENWEATHER_API_KEY[:10]}...")
-    print(f"MODEL: {MODEL}")
+# ==========================================
+OPENWEATHER_API_KEY = os.getenv(
+    "OPENWEATHER_API_KEY",
+    "",
+)
