@@ -1,3 +1,3 @@
-from app.ai.provider_factory import ProviderFactory
+from app.ai.ai_manager import AIManager
 
-ai = ProviderFactory.get_provider()
+ai = AIManager()

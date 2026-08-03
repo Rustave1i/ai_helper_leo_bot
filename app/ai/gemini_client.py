@@ -2,17 +2,10 @@ from app.ai.base_client import BaseAIClient
 
 
 class GeminiClient(BaseAIClient):
+    """Временная реализация Gemini."""
 
     def ask(
         self,
-        user_id: int,
-        message: str,
+        messages: list[dict],
     ) -> str:
-
         return "Gemini пока не подключен."
-
-    def clear_history(
-        self,
-        user_id: int,
-    ) -> None:
-        pass

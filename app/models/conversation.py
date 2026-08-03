@@ -9,7 +9,13 @@ class ConversationStore:
     def __init__(self):
         self._conversations = defaultdict(list)
 
-    def add_message(self, user_id: int, role: str, content: str):
+    def add(
+        self,
+        user_id: int,
+        role: str,
+        content: str,
+    ) -> None:
+
         messages = self._conversations[user_id]
 
         messages.append(
@@ -19,12 +25,26 @@ class ConversationStore:
             }
         )
 
-        # Оставляем только последние сообщения
         if len(messages) > self.MAX_MESSAGES:
             del messages[0]
 
-    def get_messages(self, user_id: int):
-        return self._conversations[user_id]
+    def get(
+        self,
+        user_id: int,
+    ) -> list:
 
-    def clear(self, user_id: int):
+        return list(self._conversations[user_id])
+
+    def clear(
+        self,
+        user_id: int,
+    ) -> None:
+
         self._conversations[user_id].clear()
+
+    def exists(
+        self,
+        user_id: int,
+    ) -> bool:
+
+        return user_id in self._conversations
