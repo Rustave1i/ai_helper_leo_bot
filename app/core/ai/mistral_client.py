@@ -13,6 +13,7 @@ from .base_client import BaseAIClient
 
 
 class MistralClient(BaseAIClient):
+    """Клиент Mistral AI."""
 
     def __init__(self):
 
@@ -27,18 +28,15 @@ class MistralClient(BaseAIClient):
         messages: Sequence[Message],
     ) -> str:
 
-        payload = self._adapter.convert(messages)
+        payload = self._adapter.to_provider_format(
+            messages
+        )
 
         response = self._client.chat.complete(
             model=MISTRAL_MODEL,
             messages=payload,
         )
 
-        answer = response.choices[0].message.content
-
-        if answer is None:
-            raise RuntimeError(
-                "Mistral вернул пустой ответ."
-            )
-
-        return answer.strip()
+        return self._adapter.from_provider_response(
+            response
+        )

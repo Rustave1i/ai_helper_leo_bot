@@ -13,6 +13,7 @@ from .base_client import BaseAIClient
 
 
 class GeminiClient(BaseAIClient):
+    """Клиент Google Gemini."""
 
     def __init__(self):
 
@@ -27,16 +28,15 @@ class GeminiClient(BaseAIClient):
         messages: Sequence[Message],
     ) -> str:
 
-        contents = self._adapter.convert(messages)
+        contents = self._adapter.to_provider_format(
+            messages
+        )
 
         response = self._client.models.generate_content(
             model=GEMINI_MODEL,
             contents=contents,
         )
 
-        if response.text is None:
-            raise RuntimeError(
-                "Gemini вернул пустой ответ."
-            )
-
-        return response.text.strip()
+        return self._adapter.from_provider_response(
+            response
+        )

@@ -7,7 +7,7 @@ from .base_adapter import BaseAdapter
 
 class MistralAdapter(BaseAdapter):
 
-    def convert(
+    def to_provider_format(
         self,
         messages: Sequence[Message],
     ) -> list[dict]:
@@ -24,3 +24,17 @@ class MistralAdapter(BaseAdapter):
             )
 
         return payload
+
+    def from_provider_response(
+        self,
+        response,
+    ) -> str:
+
+        answer = response.choices[0].message.content
+
+        if answer is None:
+            raise RuntimeError(
+                "Mistral вернул пустой ответ."
+            )
+
+        return answer.strip()

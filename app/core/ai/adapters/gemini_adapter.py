@@ -7,7 +7,7 @@ from .base_adapter import BaseAdapter
 
 class GeminiAdapter(BaseAdapter):
 
-    def convert(
+    def to_provider_format(
         self,
         messages: Sequence[Message],
     ) -> list[dict]:
@@ -33,3 +33,15 @@ class GeminiAdapter(BaseAdapter):
             )
 
         return contents
+
+    def from_provider_response(
+        self,
+        response,
+    ) -> str:
+
+        if response.text is None:
+            raise RuntimeError(
+                "Gemini вернул пустой ответ."
+            )
+
+        return response.text.strip()
