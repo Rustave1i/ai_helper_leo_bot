@@ -1,13 +1,13 @@
 from abc import ABC, abstractmethod
 
+from app.core.models import Message
+
 
 class BaseAIClient(ABC):
-    """Базовый интерфейс AI-провайдера."""
 
     @abstractmethod
-    def ask(self, messages: list[dict]) -> str:
-        """
-        Получает историю сообщений и
-        возвращает ответ модели.
-        """
-        raise NotImplementedError
+    def ask(
+        self,
+        messages: list[Message],
+    ) -> str:
+        pass
