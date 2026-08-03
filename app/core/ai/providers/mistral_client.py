@@ -8,7 +8,7 @@ from app.config import (
 )
 from app.core.models import Message
 
-from .adapters import MistralAdapter
+from ..adapters import MistralAdapter
 from .base_client import BaseAIClient
 
 

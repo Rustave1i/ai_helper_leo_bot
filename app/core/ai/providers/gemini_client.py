@@ -8,7 +8,7 @@ from app.config import (
 )
 from app.core.models import Message
 
-from .adapters import GeminiAdapter
+from ..adapters import GeminiAdapter
 from .base_client import BaseAIClient
 
 
