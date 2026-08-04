@@ -3,26 +3,58 @@ import os
 
 from dotenv import load_dotenv
 
-# Корневая папка проекта
+# ==========================================
+# Пути проекта
+# ==========================================
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Загружаем .env
 load_dotenv(BASE_DIR / ".env")
 
 # ==========================================
-# Какой AI использовать
+# AI
 # ==========================================
-AI_PROVIDER = os.getenv("AI_PROVIDER", "mistral")
+
+AI_PROVIDER = os.getenv(
+    "AI_PROVIDER",
+    "openrouter",
+)
+
+AI_TIMEOUT = int(
+    os.getenv(
+        "AI_TIMEOUT",
+        "90",
+    )
+)
+
+AI_RETRIES = int(
+    os.getenv(
+        "AI_RETRIES",
+        "3",
+    )
+)
+
+AI_RETRY_DELAY = int(
+    os.getenv(
+        "AI_RETRY_DELAY",
+        "2",
+    )
+)
 
 # ==========================================
 # Telegram
 # ==========================================
+
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 # ==========================================
 # Mistral
 # ==========================================
-MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY")
+
+MISTRAL_API_KEY = os.getenv(
+    "MISTRAL_API_KEY",
+)
+
 MISTRAL_MODEL = os.getenv(
     "MISTRAL_MODEL",
     "mistral-small-latest",
@@ -31,7 +63,11 @@ MISTRAL_MODEL = os.getenv(
 # ==========================================
 # Gemini
 # ==========================================
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+
+GEMINI_API_KEY = os.getenv(
+    "GEMINI_API_KEY",
+)
+
 GEMINI_MODEL = os.getenv(
     "GEMINI_MODEL",
     "gemini-2.5-flash",
@@ -40,7 +76,11 @@ GEMINI_MODEL = os.getenv(
 # ==========================================
 # OpenRouter
 # ==========================================
-OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+
+OPENROUTER_API_KEY = os.getenv(
+    "OPENROUTER_API_KEY",
+)
+
 OPENROUTER_MODEL = os.getenv(
     "OPENROUTER_MODEL",
     "openrouter/auto",
@@ -49,6 +89,7 @@ OPENROUTER_MODEL = os.getenv(
 # ==========================================
 # OpenWeather
 # ==========================================
+
 OPENWEATHER_API_KEY = os.getenv(
     "OPENWEATHER_API_KEY",
     "",

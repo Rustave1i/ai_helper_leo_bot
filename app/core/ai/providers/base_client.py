@@ -1,13 +1,15 @@
 from abc import ABC, abstractmethod
+from collections.abc import Sequence
 
 from app.core.models import Message
 
 
 class BaseAIClient(ABC):
+    """Базовый интерфейс AI-клиента."""
 
     @abstractmethod
     def ask(
         self,
-        messages: list[Message],
+        messages: Sequence[Message],
     ) -> str:
-        pass
+        """Отправляет сообщения модели и возвращает ответ."""

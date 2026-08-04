@@ -1,37 +1,51 @@
 from telegram import Update
 from telegram.ext import ContextTypes
-from app.services import chat_service
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Команда /start."""
-
-    await update.message.reply_text(
-        "👋 Привет!\n\n"
-        "Я AI Helper Bot.\n"
-        "Напишите мне любой вопрос."
-    )
+from app.core.chat import chat
 
 
-async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Команда /help."""
+async def start(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+) -> None:
 
-    await update.message.reply_text(
-        "Доступные команды:\n"
-        "/start\n"
-        "/help\n"
-        "/reset\n"
-    )
+    if update.message:
 
-async def reset(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Очистить историю диалога."""
+        await update.message.reply_text(
+            "Привет! Я AI Helper.\n\n"
+            "Напиши любой вопрос."
+        )
+
+
+async def help_command(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+) -> None:
+
+    if update.message:
+
+        await update.message.reply_text(
+            "Доступные команды:\n\n"
+            "/start\n"
+            "/help\n"
+            "/reset"
+        )
+
+
+async def reset(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+) -> None:
 
     user = update.effective_user
 
     if user is None:
         return
 
-    chat_service.reset(user.id)
+    chat.reset(user.id)
 
-    await update.message.reply_text(
-        "🗑 История диалога очищена."
-    )
+    if update.message:
+
+        await update.message.reply_text(
+            "История очищена."
+        )

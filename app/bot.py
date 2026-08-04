@@ -24,20 +24,27 @@ def main() -> None:
         .build()
     )
 
-    # Команды
     application.add_handler(
-        CommandHandler("start", start)
+        CommandHandler(
+            "start",
+            start,
+        )
     )
 
     application.add_handler(
-        CommandHandler("help", help_command)
+        CommandHandler(
+            "help",
+            help_command,
+        )
     )
 
     application.add_handler(
-        CommandHandler("reset", reset)
+        CommandHandler(
+            "reset",
+            reset,
+        )
     )
 
-    # Обычные сообщения
     application.add_handler(
         MessageHandler(
             filters.TEXT & ~filters.COMMAND,

@@ -1,9 +1,16 @@
 import time
 
 from telegram import Update
+from telegram.error import (
+    NetworkError,
+    TimedOut,
+)
 from telegram.ext import ContextTypes
 
 from app.core.chat import chat
+from app.infrastructure.telegram import (
+    TypingIndicator,
+)
 from app.logger import logger
 
 
@@ -11,7 +18,6 @@ async def chat_message(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
 ) -> None:
-    """Обработка текстовых сообщений."""
 
     if not update.message or not update.message.text:
         return
@@ -21,39 +27,51 @@ async def chat_message(
     if user is None:
         return
 
-    user_text = update.message.text
-
     logger.info(
         'USER=%s | NAME="%s" | MESSAGE="%s"',
         user.id,
         user.full_name,
-        user_text,
+        update.message.text,
     )
 
     try:
 
-        start = time.perf_counter()
+        ai_started = time.perf_counter()
 
-        answer = chat.process(
-            user_id=user.id,
-            text=user_text,
-        )
+        async with TypingIndicator(
+            context.bot,
+            update.effective_chat.id,
+        ):
 
-        elapsed = time.perf_counter() - start
+            answer = chat.process(
+                user_id=user.id,
+                text=update.message.text,
+            )
 
         logger.info(
-            "Ответ AI за %.2f сек.",
-            elapsed,
+            "AI completed in %.2f sec",
+            time.perf_counter() - ai_started,
         )
 
-        await update.message.reply_text(answer)
+        telegram_started = time.perf_counter()
+
+        await update.message.reply_text(
+            answer,
+        )
+
+        logger.info(
+            "Telegram send in %.2f sec",
+            time.perf_counter() - telegram_started,
+        )
+
+    except (TimedOut, NetworkError):
+
+        logger.exception(
+            "Telegram network error"
+        )
 
     except Exception:
 
         logger.exception(
-            "Ошибка ChatEngine"
-        )
-
-        await update.message.reply_text(
-            "⚠️ Не удалось получить ответ от AI."
+            "ChatEngine error"
         )

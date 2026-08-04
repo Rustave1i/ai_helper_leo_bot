@@ -17,11 +17,11 @@ class OpenRouterClient(OpenAICompatibleClient):
 
     BASE_URL = "https://openrouter.ai/api/v1"
 
-    def __init__(self):
+    def __init__(self) -> None:
 
         super().__init__(
             api_key=OPENROUTER_API_KEY,
-            model=OPENROUTER_MODEL,
             base_url=self.BASE_URL,
+            model=OPENROUTER_MODEL,
             adapter=OpenRouterAdapter(),
         )
