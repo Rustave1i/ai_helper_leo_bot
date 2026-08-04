@@ -1,15 +1,7 @@
-from app.core.ai import ai
-from app.core.memory import memory
+from app.core.container import container
 
-from .engine import ConversationEngine
-
-
-conversation = ConversationEngine(
-    ai=ai,
-    memory=memory,
-)
+chat = container.chat
 
 __all__ = [
-    "ConversationEngine",
-    "conversation",
+    "chat",
 ]

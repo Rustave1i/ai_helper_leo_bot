@@ -1,46 +1,47 @@
-from collections.abc import Sequence
+from collections import defaultdict
 
 from app.core.models import Message
 
 from .base_memory import BaseMemory
-from .memory_store import MemoryStore
 
 
 class ChatMemory(BaseMemory):
-    """Управляет историей сообщений пользователей."""
+    """Хранит историю переписки пользователей."""
 
     MAX_MESSAGES = 20
 
     def __init__(self) -> None:
 
-        self._store = MemoryStore()
+        self._history: dict[
+            int,
+            list[Message],
+        ] = defaultdict(list)
 
-    def get(
-        self,
-        user_id: int,
-    ) -> Sequence[Message]:
-
-        return self._store.get(user_id)
-
-    def add(
+    def add_message(
         self,
         user_id: int,
         message: Message,
     ) -> None:
 
-        self._store.add(
-            user_id=user_id,
-            message=message,
+        messages = self._history[user_id]
+
+        messages.append(message)
+
+        if len(messages) > self.MAX_MESSAGES:
+            del messages[0]
+
+    def get_history(
+        self,
+        user_id: int,
+    ) -> list[Message]:
+
+        return list(
+            self._history[user_id]
         )
-
-        history = self._store.get(user_id)
-
-        if len(history) > self.MAX_MESSAGES:
-            del history[0]
 
     def clear(
         self,
         user_id: int,
     ) -> None:
 
-        self._store.clear(user_id)
+        self._history[user_id].clear()

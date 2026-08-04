@@ -5,24 +5,22 @@ from app.core.models import Message
 
 
 class BaseMemory(ABC):
-    """Базовый интерфейс памяти чата."""
+    """Базовый интерфейс хранилища истории сообщений."""
 
     @abstractmethod
-    def get(
-        self,
-        user_id: int,
-    ) -> Sequence[Message]:
-        """Возвращает историю сообщений."""
-        raise NotImplementedError
-
-    @abstractmethod
-    def add(
+    def add_message(
         self,
         user_id: int,
         message: Message,
     ) -> None:
-        """Добавляет сообщение."""
-        raise NotImplementedError
+        """Добавляет сообщение в историю."""
+
+    @abstractmethod
+    def get_history(
+        self,
+        user_id: int,
+    ) -> Sequence[Message]:
+        """Возвращает историю сообщений."""
 
     @abstractmethod
     def clear(
@@ -30,4 +28,3 @@ class BaseMemory(ABC):
         user_id: int,
     ) -> None:
         """Очищает историю пользователя."""
-        raise NotImplementedError
