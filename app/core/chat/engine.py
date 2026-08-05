@@ -1,6 +1,7 @@
 from app.core.ai.engine import AIEngine
 from app.core.memory.chat_memory import ChatMemory
 from app.core.models import Message, Role
+from app.core.tools import ToolManager
 
 
 class ChatEngine:
@@ -10,17 +11,18 @@ class ChatEngine:
         self,
         ai: AIEngine,
         memory: ChatMemory,
+        tools: ToolManager,
     ) -> None:
 
         self._ai = ai
         self._memory = memory
+        self._tools = tools
 
-    def process(
+    async def process(
         self,
         user_id: int,
         text: str,
     ) -> str:
-        """Обрабатывает сообщение пользователя."""
 
         text = text.strip()
 
@@ -32,9 +34,21 @@ class ChatEngine:
             text=text,
         )
 
-        answer = self._ai.ask(
-            self._memory.get_history(user_id)
+        tool_result = await self._tools.execute(
+            text,
         )
+
+        if tool_result is not None:
+
+            answer = tool_result
+
+        else:
+
+            answer = await self._ai.ask(
+                self._memory.get_history(
+                    user_id,
+                )
+            )
 
         self._add_assistant_message(
             user_id=user_id,
@@ -47,9 +61,10 @@ class ChatEngine:
         self,
         user_id: int,
     ) -> None:
-        """Очищает историю пользователя."""
 
-        self._memory.clear(user_id)
+        self._memory.clear(
+            user_id,
+        )
 
     def _add_user_message(
         self,

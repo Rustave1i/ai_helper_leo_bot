@@ -8,7 +8,7 @@ class BaseAIClient(ABC):
     """Базовый интерфейс AI-клиента."""
 
     @abstractmethod
-    def ask(
+    async def ask(
         self,
         messages: Sequence[Message],
     ) -> str:

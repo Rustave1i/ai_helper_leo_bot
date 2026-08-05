@@ -3,16 +3,12 @@ from app.config import (
     OPENROUTER_MODEL,
 )
 
-from ..adapters.openrouter_adapter import (
-    OpenRouterAdapter,
-)
+from ..adapters.openrouter_adapter import OpenRouterAdapter
 
-from .openai_compatible_client import (
-    OpenAICompatibleClient,
-)
+from .openai_client import OpenAIClient
 
 
-class OpenRouterClient(OpenAICompatibleClient):
+class OpenRouterClient(OpenAIClient):
     """Клиент OpenRouter."""
 
     BASE_URL = "https://openrouter.ai/api/v1"

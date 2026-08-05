@@ -41,6 +41,27 @@ AI_RETRY_DELAY = int(
     )
 )
 
+HTTP_TIMEOUT = int(
+    os.getenv(
+        "HTTP_TIMEOUT",
+        "90",
+    )
+)
+
+HTTP_RETRIES = int(
+    os.getenv(
+        "HTTP_RETRIES",
+        "3",
+    )
+)
+
+HTTP_RETRY_DELAY = int(
+    os.getenv(
+        "HTTP_RETRY_DELAY",
+        "2",
+    )
+)
+
 # ==========================================
 # Telegram
 # ==========================================

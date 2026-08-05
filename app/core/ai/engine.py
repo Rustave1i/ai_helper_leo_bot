@@ -1,13 +1,11 @@
 from collections.abc import Sequence
 
 from app.config import AI_PROVIDER
-from app.core.ai.prompts import SYSTEM_PROMPT
-from app.core.models import Message, Role
+from app.core.models import Message
 from app.logger import logger
 
 from .provider_types import AIProvider
 from .providers import (
-    BaseAIClient,
     GeminiClient,
     MistralClient,
     OpenRouterClient,
@@ -15,27 +13,18 @@ from .providers import (
 
 
 class AIEngine:
-    """Единая точка входа для работы с AI."""
+    """Единая точка входа для AI-провайдеров."""
 
     def __init__(self) -> None:
 
-        self._provider = self._resolve_provider()
-
-        self._client_classes: dict[
-            AIProvider,
-            type[BaseAIClient],
-        ] = {
-            AIProvider.GEMINI: GeminiClient,
-            AIProvider.MISTRAL: MistralClient,
-            AIProvider.OPENROUTER: OpenRouterClient,
+        self._clients = {
+            AIProvider.GEMINI: GeminiClient(),
+            AIProvider.MISTRAL: MistralClient(),
+            AIProvider.OPENROUTER: OpenRouterClient(),
         }
 
-        self._client: BaseAIClient | None = None
-
-    def _resolve_provider(self) -> AIProvider:
-
         try:
-            return AIProvider(
+            self._provider = AIProvider(
                 AI_PROVIDER.lower()
             )
 
@@ -46,24 +35,7 @@ class AIEngine:
                 AI_PROVIDER,
             )
 
-            return AIProvider.OPENROUTER
-
-    def _get_client(self) -> BaseAIClient:
-
-        if self._client is None:
-
-            client_class = self._client_classes[
-                self._provider
-            ]
-
-            self._client = client_class()
-
-            logger.info(
-                "Создан AI клиент: %s",
-                client_class.__name__,
-            )
-
-        return self._client
+            self._provider = AIProvider.OPENROUTER
 
     @property
     def provider(self) -> AIProvider:
@@ -75,26 +47,22 @@ class AIEngine:
     ) -> None:
 
         self._provider = provider
-        self._client = None
 
-    def ask(
+    async def ask(
         self,
         messages: Sequence[Message],
     ) -> str:
 
-        payload = [
-            Message(
-                role=Role.SYSTEM,
-                content=SYSTEM_PROMPT,
-            )
+        client = self._clients[
+            self._provider
         ]
-
-        payload.extend(messages)
 
         logger.info(
             "AI Provider=%s Messages=%d",
             self._provider.value,
-            len(payload),
+            len(messages),
         )
 
-        return self._get_client().ask(payload)
+        return await client.ask(
+            messages
+        )

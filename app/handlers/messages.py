@@ -1,6 +1,7 @@
 import time
 
 from telegram import Update
+from telegram.constants import ChatAction
 from telegram.error import (
     NetworkError,
     TimedOut,
@@ -8,9 +9,6 @@ from telegram.error import (
 from telegram.ext import ContextTypes
 
 from app.core.chat import chat
-from app.infrastructure.telegram import (
-    TypingIndicator,
-)
 from app.logger import logger
 
 
@@ -18,6 +16,7 @@ async def chat_message(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
 ) -> None:
+    """Обработка текстовых сообщений."""
 
     if not update.message or not update.message.text:
         return
@@ -27,33 +26,35 @@ async def chat_message(
     if user is None:
         return
 
+    text = update.message.text
+
     logger.info(
         'USER=%s | NAME="%s" | MESSAGE="%s"',
         user.id,
         user.full_name,
-        update.message.text,
+        text,
     )
 
     try:
 
-        ai_started = time.perf_counter()
+        await context.bot.send_chat_action(
+            chat_id=update.effective_chat.id,
+            action=ChatAction.TYPING,
+        )
 
-        async with TypingIndicator(
-            context.bot,
-            update.effective_chat.id,
-        ):
+        started = time.perf_counter()
 
-            answer = chat.process(
-                user_id=user.id,
-                text=update.message.text,
-            )
+        answer = await chat.process(
+            user_id=user.id,
+            text=text,
+        )
 
         logger.info(
             "AI completed in %.2f sec",
-            time.perf_counter() - ai_started,
+            time.perf_counter() - started,
         )
 
-        telegram_started = time.perf_counter()
+        send_started = time.perf_counter()
 
         await update.message.reply_text(
             answer,
@@ -61,7 +62,7 @@ async def chat_message(
 
         logger.info(
             "Telegram send in %.2f sec",
-            time.perf_counter() - telegram_started,
+            time.perf_counter() - send_started,
         )
 
     except (TimedOut, NetworkError):
@@ -73,5 +74,18 @@ async def chat_message(
     except Exception:
 
         logger.exception(
-            "ChatEngine error"
+            "AI processing error"
+
         )
+
+        try:
+
+            await update.message.reply_text(
+                "⚠️ Произошла ошибка при обработке запроса."
+            )
+
+        except Exception:
+
+            logger.exception(
+                "Не удалось отправить сообщение пользователю."
+            )

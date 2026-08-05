@@ -9,7 +9,7 @@ from app.config import (
 from app.core.models import Message
 
 from ..adapters import MistralAdapter
-from .base_client import BaseAIClient
+from .base_ai_client import BaseAIClient
 
 
 class MistralClient(BaseAIClient):
