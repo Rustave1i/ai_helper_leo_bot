@@ -9,8 +9,9 @@ CREATE TABLE IF NOT EXISTS Chats (
     type TEXT NOT NULL,
     title TEXT,
     username TEXT,
-    created_at TEXT NOT NULL,
-    updated_at TEXT NOT NULL
+
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 -- =====================================================
@@ -24,8 +25,9 @@ CREATE TABLE IF NOT EXISTS Users (
     last_name TEXT,
     language_code TEXT,
     is_bot INTEGER NOT NULL DEFAULT 0,
-    created_at TEXT NOT NULL,
-    updated_at TEXT NOT NULL
+
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 -- =====================================================
@@ -40,11 +42,11 @@ CREATE TABLE IF NOT EXISTS Messages (
     chat_id INTEGER NOT NULL,
     user_id INTEGER NOT NULL,
 
-    reply_to_message_id INTEGER,
+    reply_to_telegram_message_id INTEGER,
 
     text TEXT,
 
-    created_at TEXT NOT NULL,
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     edited_at TEXT,
 
     is_deleted INTEGER NOT NULL DEFAULT 0,
@@ -69,7 +71,7 @@ CREATE TABLE IF NOT EXISTS MessageHistory (
 
     text TEXT NOT NULL,
 
-    edited_at TEXT NOT NULL,
+    edited_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     FOREIGN KEY (message_id)
         REFERENCES Messages(id)
