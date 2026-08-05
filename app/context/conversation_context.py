@@ -1,13 +1,15 @@
-from datetime import datetime
+from datetime import UTC, datetime
 
-from ..domain.base import DomainModel
-from ..domain.chat import Chat
-from ..domain.message import Message
-from ..domain.user import User
+from pydantic import Field
+
+from app.domain.base import DomainModel
+from app.domain.chat import Chat
+from app.domain.message import Message
+from app.domain.user import User
 
 
-class ConversationEvent(DomainModel):
-    """Новое сообщение, поступившее в Leo."""
+class ConversationContext(DomainModel):
+    """Контекст обработки входящего сообщения."""
 
     chat: Chat
 
@@ -15,4 +17,6 @@ class ConversationEvent(DomainModel):
 
     message: Message
 
-    received_at: datetime
+    received_at: datetime = Field(
+        default_factory=lambda: datetime.now(UTC),
+    )
