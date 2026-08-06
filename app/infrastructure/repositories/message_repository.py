@@ -80,3 +80,37 @@ class MessageRepository(BaseRepository):
         messages.reverse()
 
         return messages
+
+    async def get_by_telegram_message_id(
+        self,
+        telegram_message_id: int,
+    ) -> Message | None:
+
+        row = await self._database.fetch_one(
+            """
+            SELECT
+                telegram_message_id,
+                chat_id,
+                user_id,
+                reply_to_telegram_message_id,
+                text,
+                is_deleted
+            FROM Messages
+            WHERE telegram_message_id = ?;
+            """,
+            (
+                telegram_message_id,
+            ),
+        )
+
+        if row is None:
+            return None
+
+        return Message(
+            telegram_message_id=row["telegram_message_id"],
+            chat_id=row["chat_id"],
+            user_id=row["user_id"],
+            reply_to_telegram_message_id=row["reply_to_telegram_message_id"],
+            text=row["text"],
+            is_deleted=bool(row["is_deleted"]),
+        )

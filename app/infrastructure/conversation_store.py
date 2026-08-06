@@ -51,3 +51,11 @@ class ConversationStore:
             chat_id,
             limit,
         )
+
+    async def get_message(
+        self,
+        telegram_message_id: int,
+    ) -> Message | None:
+        return await self._message_repository.get_by_telegram_message_id(
+            telegram_message_id,
+        )
