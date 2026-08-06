@@ -1,6 +1,7 @@
 from app.context.conversation_context import ConversationContext
 from app.infrastructure.ai.base import AIClient
 from app.infrastructure.ai.models import AIResponse
+from app.infrastructure.conversation_store import ConversationStore
 from app.leo.prompt_builder import PromptBuilder
 
 
@@ -10,9 +11,11 @@ class Assistant:
     def __init__(
         self,
         prompt_builder: PromptBuilder,
+        conversation_store: ConversationStore,
         ai: AIClient,
     ) -> None:
         self._prompt_builder = prompt_builder
+        self._conversation_store = conversation_store
         self._ai = ai
 
     async def handle(
@@ -25,8 +28,13 @@ class Assistant:
         ):
             return None
 
+        history = await self._conversation_store.get_last_messages(
+            chat_id=context.chat.telegram_chat_id,
+            limit=20,
+        )
+
         request = self._prompt_builder.build(
-            context,
+            history=history,
         )
 
         return await self._ai.generate(
@@ -47,7 +55,8 @@ class Assistant:
         ).lower()
 
         return (
-            "@leo" in text
-            or "leo" in text
+            "@ai_helper_leo_bot" in text
+            or "@leo" in text
             or "лео" in text
+            or "leo" in text
         )
