@@ -14,6 +14,9 @@ from app.infrastructure.repositories.message_repository import MessageRepository
 from app.infrastructure.repositories.user_repository import UserRepository
 from app.leo.assistant import Assistant
 from app.leo.context.engine import ContextEngine
+from app.leo.context.providers.history_provider import (
+    HistoryProvider,
+)
 from app.leo.prompt_builder import PromptBuilder
 from app.leo.prompt_loader import PromptLoader
 
@@ -66,9 +69,13 @@ async def initialize():
         PROMPTS_PATH,
     )
 
+    history_provider = HistoryProvider(
+        conversation_store=conversation_store,
+    )
+
     context_engine = ContextEngine(
         loader=prompt_loader,
-        conversation_store=conversation_store,
+        history_provider=history_provider,
     )
 
     prompt_builder = PromptBuilder()
