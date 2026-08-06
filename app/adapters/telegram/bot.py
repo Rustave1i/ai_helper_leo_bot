@@ -11,6 +11,7 @@ from app.adapters.telegram.mapper import TelegramMapper
 from app.config import settings
 from app.domain.message import Message
 from app.domain.system_users import LEO_USER_ID
+from app.infrastructure.conversation_store import ConversationStore
 from app.leo.assistant import Assistant
 
 
@@ -20,8 +21,10 @@ class TelegramBot:
     def __init__(
         self,
         assistant: Assistant,
+        conversation_store: ConversationStore,
     ) -> None:
         self._assistant = assistant
+        self._conversation_store = conversation_store
 
         self._application = (
             Application.builder()
@@ -69,6 +72,10 @@ class TelegramBot:
             update,
         )
 
+        await self._conversation_store.save(
+            conversation,
+        )
+
         response = await self._assistant.handle(
             conversation,
         )
@@ -80,7 +87,7 @@ class TelegramBot:
             response.text,
         )
 
-        await self._assistant._conversation_store.save_outgoing_message(
+        await self._conversation_store.save_outgoing_message(
             Message(
                 telegram_message_id=reply.message_id,
                 chat_id=reply.chat.id,

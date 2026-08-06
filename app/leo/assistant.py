@@ -41,7 +41,10 @@ class Assistant:
         if context.chat.type == "private":
             return True
 
-        text = (context.message.text or "").lower()
+        text = (
+            context.message.text
+            or ""
+        ).lower()
 
         return (
             "@leo" in text

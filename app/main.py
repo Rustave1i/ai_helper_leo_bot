@@ -6,6 +6,9 @@ from app.infrastructure.ai.factory import create_ai_client
 from app.infrastructure.conversation_store import ConversationStore
 from app.infrastructure.database.initializer import DatabaseInitializer
 from app.infrastructure.database.sqlite import SQLiteDatabase
+from app.infrastructure.database.system_user_initializer import (
+    SystemUserInitializer,
+)
 from app.infrastructure.repositories.chat_repository import ChatRepository
 from app.infrastructure.repositories.message_repository import MessageRepository
 from app.infrastructure.repositories.user_repository import UserRepository
@@ -19,7 +22,8 @@ SCHEMA_PATH = Path("app/infrastructure/database/schema.sql")
 PROMPTS_PATH = Path("app/leo/prompts")
 
 
-async def initialize() -> Assistant:
+async def initialize():
+
     database = SQLiteDatabase(
         DATABASE_PATH,
     )
@@ -36,6 +40,12 @@ async def initialize() -> Assistant:
     user_repository = UserRepository(
         database,
     )
+
+    system_user_initializer = SystemUserInitializer(
+        user_repository,
+    )
+
+    await system_user_initializer.initialize()
 
     chat_repository = ChatRepository(
         database,
@@ -61,22 +71,26 @@ async def initialize() -> Assistant:
 
     ai = create_ai_client()
 
+    assistant = Assistant(
+        prompt_builder=prompt_builder,
+        ai=ai,
+    )
+
     return (
-        Assistant(
-            prompt_builder=prompt_builder,
-            ai=ai,
-        ),
+        assistant,
         conversation_store,
     )
 
 
 def main() -> None:
-    assistant = asyncio.run(
+
+    assistant, conversation_store = asyncio.run(
         initialize(),
     )
 
     bot = TelegramBot(
         assistant=assistant,
+        conversation_store=conversation_store,
     )
 
     print("Leo started.")
