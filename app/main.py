@@ -13,6 +13,7 @@ from app.infrastructure.repositories.chat_repository import ChatRepository
 from app.infrastructure.repositories.message_repository import MessageRepository
 from app.infrastructure.repositories.user_repository import UserRepository
 from app.leo.assistant import Assistant
+from app.leo.context.engine import ContextEngine
 from app.leo.prompt_builder import PromptBuilder
 from app.leo.prompt_loader import PromptLoader
 
@@ -65,13 +66,17 @@ async def initialize():
         PROMPTS_PATH,
     )
 
-    prompt_builder = PromptBuilder(
-        prompt_loader,
+    context_engine = ContextEngine(
+        loader=prompt_loader,
+        conversation_store=conversation_store,
     )
+
+    prompt_builder = PromptBuilder()
 
     ai = create_ai_client()
 
     assistant = Assistant(
+        context_engine=context_engine,
         prompt_builder=prompt_builder,
         ai=ai,
     )
