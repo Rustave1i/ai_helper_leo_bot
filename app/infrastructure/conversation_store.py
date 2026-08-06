@@ -1,11 +1,12 @@
 from app.context.conversation_context import ConversationContext
+from app.domain.message import Message
 from app.infrastructure.repositories.chat_repository import ChatRepository
 from app.infrastructure.repositories.message_repository import MessageRepository
 from app.infrastructure.repositories.user_repository import UserRepository
 
 
 class ConversationStore:
-    """Сохраняет данные разговора."""
+    """Сохраняет и читает историю диалога."""
 
     def __init__(
         self,
@@ -31,4 +32,22 @@ class ConversationStore:
 
         await self._message_repository.insert(
             context.message,
+        )
+
+    async def save_outgoing_message(
+        self,
+        message: Message,
+    ) -> None:
+        await self._message_repository.insert(
+            message,
+        )
+
+    async def get_last_messages(
+        self,
+        chat_id: int,
+        limit: int = 20,
+    ) -> list[Message]:
+        return await self._message_repository.get_last_messages(
+            chat_id,
+            limit,
         )
