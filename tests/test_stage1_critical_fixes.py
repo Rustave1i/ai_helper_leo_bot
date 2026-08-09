@@ -99,11 +99,11 @@ class ChatEngineStageOneTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(tools.calls, [])
         self.assertEqual(len(ai.requests), 1)
         self.assertEqual(
-            ai.requests[0][0].content,
+            ai.requests[0][1].content,
             "Hello",
         )
         self.assertEqual(
-            ai.requests[0][0].role,
+            ai.requests[0][1].role,
             Role.USER,
         )
         self.assertEqual(
