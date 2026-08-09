@@ -23,7 +23,7 @@ class GeminiClient(BaseAIClient):
 
         self._adapter = GeminiAdapter()
 
-    def ask(
+    async def ask(
         self,
         messages: Sequence[Message],
     ) -> str:
@@ -32,7 +32,7 @@ class GeminiClient(BaseAIClient):
             messages
         )
 
-        response = self._client.models.generate_content(
+        response = await self._client.aio.models.generate_content(
             model=GEMINI_MODEL,
             contents=contents,
         )

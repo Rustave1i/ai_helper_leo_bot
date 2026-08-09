@@ -23,7 +23,7 @@ class MistralClient(BaseAIClient):
 
         self._adapter = MistralAdapter()
 
-    def ask(
+    async def ask(
         self,
         messages: Sequence[Message],
     ) -> str:
@@ -32,7 +32,7 @@ class MistralClient(BaseAIClient):
             messages
         )
 
-        response = self._client.chat.complete(
+        response = await self._client.chat.complete_async(
             model=MISTRAL_MODEL,
             messages=payload,
         )
