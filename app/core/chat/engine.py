@@ -1,7 +1,11 @@
 from app.core.ai.engine import AIEngine
 from app.core.memory.chat_memory import ChatMemory
 from app.core.models import Message, Role
-from app.core.tools import ToolManager
+from app.core.tools import (
+    ToolCall,
+    ToolManager,
+    ToolResult,
+)
 
 
 class ChatEngine:
@@ -21,8 +25,25 @@ class ChatEngine:
     async def process(
         self,
         user_id: int,
-        text: str,
+        text: str | ToolCall,
     ) -> str:
+
+        if isinstance(text, ToolCall):
+
+            tool_result = await self._tools.execute(
+                text,
+            )
+
+            answer = self._tool_result_to_text(
+                tool_result,
+            )
+
+            self._add_assistant_message(
+                user_id=user_id,
+                text=answer,
+            )
+
+            return answer
 
         text = text.strip()
 
@@ -34,21 +55,11 @@ class ChatEngine:
             text=text,
         )
 
-        tool_result = await self._tools.execute(
-            text,
-        )
-
-        if tool_result is not None:
-
-            answer = tool_result
-
-        else:
-
-            answer = await self._ai.ask(
-                self._memory.get_history(
-                    user_id,
-                )
+        answer = await self._ai.ask(
+            self._memory.get_history(
+                user_id,
             )
+        )
 
         self._add_assistant_message(
             user_id=user_id,
@@ -93,3 +104,11 @@ class ChatEngine:
                 content=text,
             ),
         )
+
+    @staticmethod
+    def _tool_result_to_text(
+        result: ToolResult,
+    ) -> str:
+        """Извлекает текст из результата инструмента для history и ответа."""
+
+        return result.content

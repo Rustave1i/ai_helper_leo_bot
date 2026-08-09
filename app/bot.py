@@ -5,7 +5,7 @@ from telegram.ext import (
     filters,
 )
 
-from app.config import BOT_TOKEN
+from app.config import get_telegram_token
 from app.handlers.commands import (
     help_command,
     reset,
@@ -18,9 +18,11 @@ from app.logger import logger
 def main() -> None:
     """Точка входа Telegram-бота."""
 
+    telegram_token = get_telegram_token()
+
     application = (
         Application.builder()
-        .token(BOT_TOKEN)
+        .token(telegram_token)
         .build()
     )
 

@@ -66,7 +66,20 @@ HTTP_RETRY_DELAY = int(
 # Telegram
 # ==========================================
 
-BOT_TOKEN = os.getenv("BOT_TOKEN")
+TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
+
+
+def get_telegram_token() -> str:
+    """Возвращает настроенный Telegram token или завершает запуск с понятной ошибкой."""
+
+    token = TELEGRAM_TOKEN
+
+    if token is None or not token.strip():
+        raise RuntimeError(
+            "Telegram token is not configured. Set TELEGRAM_TOKEN."
+        )
+
+    return token
 
 # ==========================================
 # Mistral
