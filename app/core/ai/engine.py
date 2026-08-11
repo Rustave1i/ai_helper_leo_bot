@@ -1,3 +1,4 @@
+import asyncio
 from collections.abc import Sequence
 
 from app.config import (
@@ -20,6 +21,8 @@ class AIEngine:
         provider = self._resolve_provider(AI_PROVIDER)
         self._provider = provider
         self._client = self._create_client(provider)
+        self._closed = False
+        self._lifecycle_lock = asyncio.Lock()
 
     @staticmethod
     def _resolve_provider(value: str) -> AIProvider:
@@ -61,16 +64,54 @@ class AIEngine:
     def provider(self) -> AIProvider:
         return self._provider
 
-    def set_provider(self, provider: AIProvider) -> None:
-        resolved_provider = self._resolve_provider(provider)
-        client = self._create_client(resolved_provider)
-        self._provider = resolved_provider
-        self._client = client
+    async def set_provider(self, provider: AIProvider) -> None:
+        async with self._lifecycle_lock:
+            self._ensure_open()
+            resolved_provider = self._resolve_provider(provider)
+            new_client = self._create_client(resolved_provider)
+            old_provider = self._provider
+            old_client = self._client
+            self._provider = resolved_provider
+            self._client = new_client
+
+            if old_client is None:
+                return
+
+            try:
+                await old_client.close()
+            except Exception:
+                logger.exception(
+                    "Failed to close replaced AI provider=%s",
+                    old_provider.value,
+                )
+                raise
 
     async def ask(self, messages: Sequence[Message]) -> str:
-        logger.info(
-            "AI Provider=%s Messages=%d",
-            self._provider.value,
-            len(messages),
-        )
-        return await self._client.ask(messages)
+        async with self._lifecycle_lock:
+            self._ensure_open()
+            client = self._client
+            if client is None:
+                raise RuntimeError("AIEngine has no active client.")
+
+            logger.info(
+                "AI Provider=%s Messages=%d",
+                self._provider.value,
+                len(messages),
+            )
+            return await client.ask(messages)
+
+    async def close(self) -> None:
+        async with self._lifecycle_lock:
+            if self._closed:
+                return
+
+            client = self._client
+            self._client = None
+            self._closed = True
+
+            if client is not None:
+                await client.close()
+
+    def _ensure_open(self) -> None:
+        if self._closed:
+            raise RuntimeError("AIEngine is closed.")

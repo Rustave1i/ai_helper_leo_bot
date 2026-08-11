@@ -15,6 +15,9 @@ class FakeClient:
         self.requests.append(list(messages))
         return self.answer
 
+    async def close(self) -> None:
+        return None
+
 
 class ProviderSelectionTests(unittest.IsolatedAsyncioTestCase):
     def _engine(self, provider: str, **credentials):
@@ -107,7 +110,7 @@ class ProviderSelectionTests(unittest.IsolatedAsyncioTestCase):
             patch.object(engine, "OpenRouterClient") as openrouter_class,
         ):
             ai = engine.AIEngine()
-            ai.set_provider(AIProvider.MISTRAL)
+            await ai.set_provider(AIProvider.MISTRAL)
 
         self.assertEqual(ai.provider, AIProvider.MISTRAL)
         self.assertIs(ai._client, mistral)
