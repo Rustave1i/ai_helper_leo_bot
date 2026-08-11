@@ -1,7 +1,5 @@
-from app.core.container import container
-
-chat = container.chat
+from .engine import ChatEngine
 
 __all__ = [
-    "chat",
+    "ChatEngine",
 ]

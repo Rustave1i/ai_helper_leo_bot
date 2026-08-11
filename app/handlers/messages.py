@@ -8,7 +8,7 @@ from telegram.error import (
 )
 from telegram.ext import ContextTypes
 
-from app.core.chat import chat
+from app.core.container.container import container
 from app.logger import logger
 
 
@@ -44,7 +44,7 @@ async def chat_message(
 
         started = time.perf_counter()
 
-        answer = await chat.process(
+        answer = await container.chat.process(
             user_id=user.id,
             text=text,
         )

@@ -1,7 +1,7 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 
-from app.core.chat import chat
+from app.core.container.container import container
 
 
 async def start(
@@ -42,7 +42,7 @@ async def reset(
     if user is None:
         return
 
-    chat.reset(user.id)
+    container.chat.reset(user.id)
 
     if update.message:
 
