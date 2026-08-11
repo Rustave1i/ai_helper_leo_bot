@@ -6,6 +6,7 @@ from telegram.ext import (
 )
 
 from app.config import get_telegram_token
+from app.core.container.container import container
 from app.handlers.commands import (
     help_command,
     reset,
@@ -13,6 +14,10 @@ from app.handlers.commands import (
 )
 from app.handlers.messages import chat_message
 from app.logger import logger
+
+
+async def _post_shutdown(application: Application) -> None:
+    await container.ai.close()
 
 
 def main() -> None:
@@ -23,6 +28,7 @@ def main() -> None:
     application = (
         Application.builder()
         .token(telegram_token)
+        .post_shutdown(_post_shutdown)
         .build()
     )
 

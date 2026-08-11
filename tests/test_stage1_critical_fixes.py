@@ -1,3 +1,4 @@
+import inspect
 import unittest
 from unittest.mock import patch
 
@@ -59,6 +60,7 @@ class TelegramTokenTests(unittest.TestCase):
         class FakeBuilder:
             def __init__(self) -> None:
                 self.token_value = None
+                self.post_shutdown_callback = None
                 self.application = FakeApplication()
 
             def token(self, value):
@@ -67,6 +69,10 @@ class TelegramTokenTests(unittest.TestCase):
 
             def build(self):
                 return self.application
+
+            def post_shutdown(self, callback):
+                self.post_shutdown_callback = callback
+                return self
 
         builder = FakeBuilder()
 
@@ -79,6 +85,9 @@ class TelegramTokenTests(unittest.TestCase):
 
         get_token.assert_called_once_with()
         self.assertEqual(builder.token_value, "test-token")
+        self.assertTrue(
+            inspect.iscoroutinefunction(builder.post_shutdown_callback)
+        )
         self.assertTrue(builder.application.polling_started)
         self.assertEqual(len(builder.application.handlers), 4)
 
