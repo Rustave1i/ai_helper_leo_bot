@@ -13,3 +13,7 @@ class BaseAIClient(ABC):
         messages: Sequence[Message],
     ) -> str:
         """Отправляет сообщения модели и возвращает ответ."""
+
+    @abstractmethod
+    async def close(self) -> None:
+        """Освобождает ресурсы провайдера; повторный вызов безопасен."""

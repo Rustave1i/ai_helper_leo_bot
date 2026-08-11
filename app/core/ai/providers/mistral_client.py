@@ -22,6 +22,7 @@ class MistralClient(BaseAIClient):
         )
 
         self._adapter = MistralAdapter()
+        self._closed = False
 
     async def ask(
         self,
@@ -40,3 +41,14 @@ class MistralClient(BaseAIClient):
         return self._adapter.from_provider_response(
             response
         )
+
+    async def close(self) -> None:
+        if self._closed:
+            return
+
+        await self._client.__aexit__(
+            None,
+            None,
+            None,
+        )
+        self._closed = True

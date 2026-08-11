@@ -48,6 +48,7 @@ class OpenAIClient(BaseAIClient):
             retries=HTTP_RETRIES,
             delay=HTTP_RETRY_DELAY,
         )
+        self._closed = False
 
     async def ask(
         self,
@@ -104,3 +105,10 @@ class OpenAIClient(BaseAIClient):
             )
 
             raise
+
+    async def close(self) -> None:
+        if self._closed:
+            return
+
+        await self._client.close()
+        self._closed = True
