@@ -10,6 +10,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")
 
 # ==========================================
+# База данных
+# ==========================================
+DB_PATH = BASE_DIR / "data" / "bot.db"
+
+# Сколько последних сообщений чата использовать как контекст для агента
+CONTEXT_MESSAGES = int(os.getenv("CONTEXT_MESSAGES", "100"))
+
+# ==========================================
 # Какой AI использовать
 # ==========================================
 AI_PROVIDER = os.getenv("AI_PROVIDER", "mistral")
@@ -17,7 +25,7 @@ AI_PROVIDER = os.getenv("AI_PROVIDER", "mistral")
 # ==========================================
 # Telegram
 # ==========================================
-BOT_TOKEN = os.getenv("BOT_TOKEN")
+TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 
 # ==========================================
 # Mistral
@@ -38,9 +46,30 @@ GEMINI_MODEL = os.getenv(
 )
 
 # ==========================================
+# OpenRouter (universal gateway: ChatGPT, Claude, Llama и др.)
+# ==========================================
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+OPENROUTER_MODEL = os.getenv(
+    "OPENROUTER_MODEL",
+    "free",
+)
+
+# ==========================================
 # OpenWeather
 # ==========================================
 OPENWEATHER_API_KEY = os.getenv(
     "OPENWEATHER_API_KEY",
     "",
 )
+
+# ==========================================
+# Сервисы рейтингов/поиска (для совета с отзывами)
+# ==========================================
+# Выбор: 2gis | yandex | none (без внешних запросов)
+RATING_PROVIDER = os.getenv("RATING_PROVIDER", "none")
+
+# 2ГИС API
+GIS_API_KEY = os.getenv("GIS_API_KEY", "")
+
+# Яндекс Карты API
+YANDEX_API_KEY = os.getenv("YANDEX_API_KEY", "")
