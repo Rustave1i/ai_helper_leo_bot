@@ -1,30 +1,28 @@
 from abc import ABC, abstractmethod
 from collections.abc import Sequence
 
-from app.core.models import Message
+from app.core.models import ConversationKey, Message
 
 
 class BaseMemory(ABC):
-    """Базовый интерфейс хранилища истории сообщений."""
+    """Base interface for conversation history storage."""
 
     @abstractmethod
-    def add_message(
+    def append(
         self,
-        user_id: int,
+        key: ConversationKey,
         message: Message,
     ) -> None:
-        """Добавляет сообщение в историю."""
+        """Add a conversation message for a key."""
 
     @abstractmethod
-    def get_history(
+    def history(
         self,
-        user_id: int,
+        key: ConversationKey,
+        limit: int | None = None,
     ) -> Sequence[Message]:
-        """Возвращает историю сообщений."""
+        """Return oldest-to-newest messages for a key."""
 
     @abstractmethod
-    def clear(
-        self,
-        user_id: int,
-    ) -> None:
-        """Очищает историю пользователя."""
+    def clear(self, key: ConversationKey) -> None:
+        """Clear one conversation history."""

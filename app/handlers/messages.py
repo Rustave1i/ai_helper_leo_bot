@@ -9,6 +9,7 @@ from telegram.error import (
 from telegram.ext import ContextTypes
 
 from app.core.container.container import container
+from app.core.models import ConversationKey
 from app.logger import logger
 
 
@@ -17,15 +18,18 @@ async def chat_message(
     context: ContextTypes.DEFAULT_TYPE,
 ) -> None:
     """Обработка текстовых сообщений."""
-
     if not update.message or not update.message.text:
         return
 
     user = update.effective_user
-
-    if user is None:
+    chat = update.effective_chat
+    if user is None or chat is None:
         return
 
+    key = ConversationKey(
+        chat_id=chat.id,
+        user_id=user.id,
+    )
     text = update.message.text
 
     logger.info(
@@ -36,56 +40,36 @@ async def chat_message(
     )
 
     try:
-
         await context.bot.send_chat_action(
-            chat_id=update.effective_chat.id,
+            chat_id=chat.id,
             action=ChatAction.TYPING,
         )
 
         started = time.perf_counter()
-
         answer = await container.chat.process(
-            user_id=user.id,
+            key=key,
             text=text,
         )
-
         logger.info(
             "AI completed in %.2f sec",
             time.perf_counter() - started,
         )
 
         send_started = time.perf_counter()
-
-        await update.message.reply_text(
-            answer,
-        )
-
+        await update.message.reply_text(answer)
         logger.info(
             "Telegram send in %.2f sec",
             time.perf_counter() - send_started,
         )
 
     except (TimedOut, NetworkError):
-
-        logger.exception(
-            "Telegram network error"
-        )
+        logger.exception("Telegram network error")
 
     except Exception:
-
-        logger.exception(
-            "AI processing error"
-
-        )
-
+        logger.exception("AI processing error")
         try:
-
             await update.message.reply_text(
                 "⚠️ Произошла ошибка при обработке запроса."
             )
-
         except Exception:
-
-            logger.exception(
-                "Не удалось отправить сообщение пользователю."
-            )
+            logger.exception("Не удалось отправить сообщение пользователю.")

@@ -5,7 +5,7 @@ from unittest.mock import patch
 from app import config
 from app.core.chat.engine import ChatEngine
 from app.core.memory.chat_memory import ChatMemory
-from app.core.models import Role
+from app.core.models import ConversationKey, Role
 from app.core.tools import ToolCall, ToolResult
 
 
@@ -93,6 +93,9 @@ class TelegramTokenTests(unittest.TestCase):
 
 
 class ChatEngineStageOneTests(unittest.IsolatedAsyncioTestCase):
+    def setUp(self) -> None:
+        self.key = ConversationKey(chat_id=100, user_id=1)
+
     async def test_plain_text_bypasses_tools_and_reaches_ai(self) -> None:
         ai = FakeAI()
         tools = FakeTools()
@@ -100,23 +103,17 @@ class ChatEngineStageOneTests(unittest.IsolatedAsyncioTestCase):
         engine = ChatEngine(ai=ai, memory=memory, tools=tools)
 
         answer = await engine.process(
-            user_id=1,
+            key=self.key,
             text="Hello",
         )
 
         self.assertEqual(answer, "AI answer")
         self.assertEqual(tools.calls, [])
         self.assertEqual(len(ai.requests), 1)
+        self.assertEqual(ai.requests[0][1].content, "Hello")
+        self.assertEqual(ai.requests[0][1].role, Role.USER)
         self.assertEqual(
-            ai.requests[0][1].content,
-            "Hello",
-        )
-        self.assertEqual(
-            ai.requests[0][1].role,
-            Role.USER,
-        )
-        self.assertEqual(
-            [message.content for message in memory.get_history(1)],
+            [message.content for message in memory.history(self.key)],
             ["Hello", "AI answer"],
         )
 
@@ -127,13 +124,13 @@ class ChatEngineStageOneTests(unittest.IsolatedAsyncioTestCase):
         engine = ChatEngine(ai=ai, memory=memory, tools=tools)
 
         answer = await engine.process(
-            user_id=1,
+            key=self.key,
             text=ToolCall(name="weather", arguments={}),
         )
 
         self.assertEqual(answer, "Tool answer")
         self.assertEqual(len(tools.calls), 1)
         self.assertEqual(ai.requests, [])
-        history = memory.get_history(1)
+        history = memory.history(self.key)
         self.assertEqual(history[0].content, "Tool answer")
         self.assertIsInstance(history[0].content, str)
