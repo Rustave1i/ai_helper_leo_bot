@@ -32,12 +32,7 @@ async def chat_message(
     )
     text = update.message.text
 
-    logger.info(
-        'USER=%s | NAME="%s" | MESSAGE="%s"',
-        user.id,
-        user.full_name,
-        text,
-    )
+    logger.info("Text message received")
 
     try:
         await context.bot.send_chat_action(
