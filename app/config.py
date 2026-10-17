@@ -12,6 +12,21 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")
 
 # ==========================================
+# Memory
+# ==========================================
+_memory_database_path = Path(
+    os.getenv(
+        "MEMORY_DATABASE_PATH",
+        "data/conversation_memory.sqlite3",
+    )
+)
+MEMORY_DATABASE_PATH = (
+    _memory_database_path
+    if _memory_database_path.is_absolute()
+    else BASE_DIR / _memory_database_path
+)
+
+# ==========================================
 # AI
 # ==========================================
 
